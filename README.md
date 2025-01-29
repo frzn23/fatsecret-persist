@@ -49,7 +49,7 @@ To run this project, you will need:
 1. **Run the FastAPI server:**
 
    ```bash
-   uvicorn main:app --reload
+   uvicorn app:app --reload
    ```
 
 2. **Access the API documentation:**
@@ -101,13 +101,13 @@ To deploy this project, consider hosting it on a platform like Heroku, AWS, or G
 1. Create a `Procfile` with the following content:
 
    ```
-   web: uvicorn main:app --host 0.0.0.0 --port ${PORT}
+   web: uvicorn app:app --host 0.0.0.0 --port ${PORT}
    ```
 
 2. Push the code to your Heroku repository and deploy:
 
    ```bash
-   git push heroku main
+   git push heroku app
    ```
 
 ## Contributing
@@ -122,4 +122,3 @@ This project is licensed under the MIT License.
 
 - FastAPI: The Python web framework used in this project.
 - FatSecret: The API powering the food search functionality.
-```
