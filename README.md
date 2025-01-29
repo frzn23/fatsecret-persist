@@ -1,124 +1,141 @@
-```markdown
-# FatSecret Food Search API
+# FatSecret API Integration with FastAPI
 
-This project provides a FastAPI-based wrapper for interacting with the FatSecret Food Database API. It enables you to search for foods and retrieve information through an easy-to-use RESTful API interface.
+This project provides a simple REST API wrapper around the FatSecret API using FastAPI. It allows users to search for food items and retrieve their nutritional information using FatSecret's database.
 
 ## Features
 
-- **OAuth2 Authentication**: Automatically handles token generation for authenticating with the FatSecret API.
-- **Food Search**: Search for food items using customizable parameters like search term, pagination, and result limits.
-- **Query Options**: Supports optional parameters such as including sub-categories or food images in the search results.
+- OAuth2 authentication with FatSecret API
+- Food search endpoint with pagination
+- Error handling and response formatting
+- Token caching for better performance
 
 ## Prerequisites
 
-To run this project, you will need:
-
-1. Python 3.9 or later.
-2. FatSecret API credentials:
-   - `CLIENT_ID`
-   - `CLIENT_SECRET`
+- Python 3.7+
+- FatSecret API credentials (Client ID and Secret)
+- pip (Python package manager)
 
 ## Installation
 
-1. **Clone the repository**:
+1. Clone this repository:
+```bash
+git clone https://github.com/frzn23/fatsecret-persist
+cd https://github.com/frzn23/fatsecret-persist
+```
 
-   ```bash
-   git clone [https://github.com/your-username/fatsecret-food-search-api.git](https://github.com/your-username/fatsecret-food-search-api.git)
-   cd fatsecret-food-search-api
-   ```
+2. Create a virtual environment and activate it:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows, use: venv\Scripts\activate
+```
 
-2. **Set up a virtual environment (optional but recommended):**
+3. Install required packages:
+```bash
+pip install fastapi uvicorn requests
+```
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-   ```
+## Configuration
 
-3. **Install dependencies:**
+1. Sign up for a FatSecret API account at [FatSecret Platform API](https://platform.fatsecret.com/api/)
+2. Obtain your API credentials (Client ID and Client Secret)
+3. Open `app.py` and replace the placeholder credentials:
+```python
+CLIENT_ID = "your_client_id"
+CLIENT_SECRET = "your_client_secret"
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Running the Application
 
-4. **Add your FatSecret API credentials:**
+1. Start the FastAPI server:
+```bash
+uvicorn app:app --reload
+```
 
-   Replace the `CLIENT_ID` and `CLIENT_SECRET` placeholders in the code with your actual FatSecret API credentials.
-
-## Usage
-
-1. **Run the FastAPI server:**
-
-   ```bash
-   uvicorn app:app --reload
-   ```
-
-2. **Access the API documentation:**
-
-   Open your browser and navigate to `http://127.0.0.1:8000/docs` to explore the interactive Swagger UI.
-
-3. **Example Request:**
-
-   Search for foods using the `/foods/search` endpoint. For example:
-
-   ```
-   GET [http://127.0.0.1:8000/foods/search?search_expression=Cheerios&page_number=1&max_results=10](http://127.0.0.1:8000/foods/search?search_expression=Cheerios&page_number=1&max_results=10)
-   ```
+2. The API will be available at `http://127.0.0.1:8000`
 
 ## API Endpoints
 
-### `GET /foods/search`
+### Search Foods
 
-Search the FatSecret food database based on the query parameters.
+**Endpoint**: `/foods/search`
 
-**Query Parameters:**
+**Method**: GET
 
-- `search_expression` (string, optional): The term to search for.
-- `page_number` (int, default: 0): The page index (zero-based).
-- `max_results` (int, default: 20): Number of results to return per page (1–50).
-- `include_sub_categories` (bool, default: false): Whether to include sub-categories in the results.
-- `include_food_images` (bool, default: false): Whether to include food images in the results.
+**Query Parameters**:
+- `search_expression` (optional): Search term for foods
+- `page_number` (optional): Page number (zero-based index, default: 0)
+- `max_results` (optional): Number of results per page (default: 20, max: 50)
 
-**Example Request:**
-
+**Example Request**:
 ```bash
-curl -X GET "[http://127.0.0.1:8000/foods/search?search_expression=Cheerios&page_number=1&max_results=10](http://127.0.0.1:8000/foods/search?search_expression=Cheerios&page_number=1&max_results=10)" -H "accept: application/json"
+curl "http://127.0.0.1:8000/foods/search?search_expression=apple&page_number=0&max_results=20"
+```
+
+## Response Format
+
+The API returns JSON responses in the following format:
+
+```json
+{
+    "foods": {
+        "food": [
+            {
+                "food_id": "string",
+                "food_name": "string",
+                "food_type": "string",
+                "food_url": "string"
+            }
+        ],
+        "max_results": "number",
+        "page_number": "number",
+        "total_results": "number"
+    }
+}
 ```
 
 ## Error Handling
 
-The API provides descriptive error messages for:
+The API implements proper error handling for various scenarios:
 
-- Missing OAuth2 credentials.
-- Invalid or expired access tokens.
-- API request failures.
+- Invalid API credentials
+- Failed API requests
+- Invalid parameters
+- Network errors
 
-## Deployment
+Errors are returned with appropriate HTTP status codes and descriptive messages.
 
-To deploy this project, consider hosting it on a platform like Heroku, AWS, or Google Cloud. For example:
+## Limitations
 
-**Heroku Deployment Steps:**
+- This implementation uses the free tier of FatSecret API
+- The `foods.search` endpoint has rate limits according to FatSecret's policies
+- Token caching is done in-memory and will reset when the server restarts
 
-1. Create a `Procfile` with the following content:
+## Documentation
 
-   ```
-   web: uvicorn app:app --host 0.0.0.0 --port ${PORT}
-   ```
-
-2. Push the code to your Heroku repository and deploy:
-
-   ```bash
-   git push heroku app
-   ```
+For more detailed API documentation, visit:
+- Swagger UI: `http://127.0.0.1:8000/docs`
+- ReDoc: `http://127.0.0.1:8000/redoc`
 
 ## Contributing
 
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support, please:
+1. Check the FatSecret API documentation
+2. Open an issue in the repository
+3. Contact the maintainers
 
 ## Acknowledgments
 
-- FastAPI: The Python web framework used in this project.
-- FatSecret: The API powering the food search functionality.
+- [FatSecret Platform API](https://platform.fatsecret.com/api/)
+- [FastAPI](https://fastapi.tiangolo.com/)
